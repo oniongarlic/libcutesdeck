@@ -7,8 +7,6 @@
 
 #define MAX_STR 255
 
-#define IMG_SIZE 72
-
 #define POS_SE 2 // PACKET SEQUENCE NUMBER
 #define POS_PR 4 // PREVOUS PACKET SEQUENCE NUMBER
 #define POS_KI 5 // KEY INDEX
@@ -26,9 +24,9 @@ static uint8_t img_data[65535];
 
 #define VENDOR_ELGATO 0x0fd9
 
-
 CuteSdeck::CuteSdeck(QObject *parent)
-    : QObject{parent}
+    : QObject{parent},
+    m_imgsize(72,72)
 {
     int res = hid_init();
     if (res!=0) {
@@ -63,12 +61,50 @@ bool CuteSdeck::open(Devices id, QString serial)
     if (!handle) {
         qWarning("Device not found");
         return false;
-    }    
+    }
+    switch (id) {
+
+    case DeckUnknown:
+    case DeckOriginal:
+        qWarning("Untested");
+    case DeckOriginalV2:
+        m_imgsize.setHeight(72);
+        m_imgsize.setWidth(72);
+        m_buttons=15;
+        break;
+    case DeckXL:
+    case DeckXLV2:
+        qWarning("Untested");
+        m_imgsize.setHeight(96);
+        m_imgsize.setWidth(96);
+        m_buttons=32;
+        break;
+    case DeckMK2:
+        qWarning("Untested");
+        m_imgsize.setHeight(72);
+        m_imgsize.setWidth(72);
+        m_buttons=15;
+    case DeckMiniMK2:
+        qWarning("Untested");
+        m_imgsize.setHeight(72);
+        m_imgsize.setWidth(72);
+        m_buttons=6;
+        break;
+    case DeckPedal:
+        qWarning("Untested");
+        m_imgsize.setHeight(0);
+        m_imgsize.setWidth(0);
+        m_buttons=3;
+        break;
+    }
 
     emit isOpenChanged();
 
     m_serial=serialNumber();
     emit serialChanged();
+
+    qDebug() << "Button image size is " << m_imgsize;
+    qDebug() << "Buttons " << m_buttons;
 
     return true;
 }
@@ -105,6 +141,8 @@ void CuteSdeck::loop()
     if (!handle)
         return;
 
+    qDebug("Listening to buttons.");
+
     QMutexLocker locker(&mutex);
 
     while (m_running) {
@@ -120,17 +158,18 @@ void CuteSdeck::loop()
             return;
         }
 
-        if (res==0) {
+        if (res==0) {            
             QThread::msleep(20);
             continue;
         }
 
-        for (int i=0;i<15;i++) {
+        for (int i=0;i<m_buttons;i++) {
             if (buf[KEY_OFFSET+i]==1) {
                 emit keyPressed(i);
             }
         }
     }
+    qDebug("Stopped listening to buttons.");
 }
 
 int CuteSdeck::setImagePart(char key, char part)
@@ -209,8 +248,10 @@ bool CuteSdeck::setImageJPG(char key, const QString file)
     QByteArray data;
     QFile f(file);
 
-    if (!f.open(QIODevice::ReadOnly))
+    if (!f.open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to load file " << file << f.errorString();
         return false;
+    }
 
     data=f.readAll();
     f.close();
@@ -220,7 +261,7 @@ bool CuteSdeck::setImageJPG(char key, const QString file)
 
 bool CuteSdeck::setImageText(char key, const QString txt)
 {
-    QImage img=QImage(72, 72, QImage::Format_RGB32);
+    QImage img=QImage(m_imgsize, QImage::Format_RGB32);
     img.fill(0);
 
     QPainter p;
@@ -236,21 +277,27 @@ bool CuteSdeck::setImageText(char key, const QString txt)
     return setImage(key, img);
 }
 
-bool CuteSdeck::setImage(char key, const QImage &img)
+bool CuteSdeck::setImage(char key, const QImage &img, bool scale)
 {
     QByteArray tmp;
     QBuffer buf(&tmp);
+    QImage imgc=img;
 
     if (!handle)
         return false;
 
-    if (img.width()!=72 && img.height()!=72) {
-        qWarning("Button image must be 72x72");
+    if (img.isNull())
         return false;
+
+    if (!scale && img.width()!=m_imgsize.width() && img.height()!=m_imgsize.height()) {
+        qWarning() << "Button image must be " << m_imgsize;
+        return false;
+    } else if (scale) {
+        imgc=img.scaled(m_imgsize, Qt::IgnoreAspectRatio);
     }
 
     buf.open(QIODevice::WriteOnly);
-    if (img.save(&buf, "jpg", 100)) {
+    if (imgc.save(&buf, "jpg", 100)) {
         setImage(key, tmp.data(), (ssize_t)tmp.size());
         return true;
     }

@@ -50,7 +50,7 @@ public slots:
     int resetDeck();
 
     bool setImage(char key, const char *img, ssize_t imgsize);
-    bool setImage(char key, const QImage &img);
+    bool setImage(char key, const QImage &img, bool scale=false);
     int resetImages();
 
     bool setImageText(char key, const QString txt);
@@ -68,11 +68,13 @@ protected:
 private:
     QFuture<void> m_future;
     QMutex mutex;
-    bool m_running;
+    bool m_running=false;
     hid_device *handle=nullptr;
     QString m_serial;
     //struct libevdev *dev;
     //struct libevdev_uinput *uidev;
+    QSize m_imgsize;
+    int m_buttons=0;
     void loop();
 };
 
