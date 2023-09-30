@@ -8,14 +8,11 @@
 
 #include <hidapi/hidapi.h>
 #include <linux/input.h>
-// #include <libevdev/libevdev-uinput.h>
-
-// #include "libcutesdeck_global.h"
 
 class CuteSdeck : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(CuteStreamDeck)
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY isOpenChanged FINAL)
     Q_PROPERTY(QString serial READ serial NOTIFY serialChanged FINAL)
 
