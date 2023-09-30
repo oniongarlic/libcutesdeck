@@ -2,10 +2,13 @@
 
 Library for accessing a Stream Deck from Qt and QtQuick. Still very much work in progress.
 
+See example usage in example.qml file.
+
 ## Supported functions:
 * signal on button press
 * setting button images
 * adjusting brightness
+* reset deck
 
 ## Tested Stream Decks:
 * Stream Deck Version 2
@@ -13,7 +16,8 @@ Library for accessing a Stream Deck from Qt and QtQuick. Still very much work in
 ## Untested
 * All other
 
-##Todo
+## Todo
+* Implement (and test) support for other Deck versions
 
 ## Requirements:
 * libusb
