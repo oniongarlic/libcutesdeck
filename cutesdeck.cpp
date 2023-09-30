@@ -106,6 +106,8 @@ bool CuteSdeck::open(Devices id, QString serial)
     qDebug() << "Button image size is " << m_imgsize;
     qDebug() << "Buttons " << m_buttons;
 
+    emit buttonsChanged();
+
     return true;
 }
 
@@ -371,4 +373,9 @@ bool CuteSdeck::isOpen()
 QString CuteSdeck::serial() const
 {
     return m_serial;
+}
+
+uint CuteSdeck::buttons() const
+{
+    return m_buttons;
 }

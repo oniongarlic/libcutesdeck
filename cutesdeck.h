@@ -6,7 +6,7 @@
 #include <QFuture>
 #include <QQmlEngine>
 
-#include <hidapi.h>
+#include <hidapi/hidapi.h>
 #include <linux/input.h>
 // #include <libevdev/libevdev-uinput.h>
 
@@ -18,6 +18,8 @@ class CuteSdeck : public QObject
     QML_ELEMENT
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY isOpenChanged FINAL)
     Q_PROPERTY(QString serial READ serial NOTIFY serialChanged FINAL)
+
+    Q_PROPERTY(uint buttons READ buttons NOTIFY buttonsChanged FINAL)
 
 public:
     explicit CuteSdeck(QObject *parent = nullptr);
@@ -38,6 +40,8 @@ public:
     bool isOpen();
 
     QString serial() const;
+
+    uint buttons() const;
 
 public slots:
     bool open(Devices id);
@@ -64,6 +68,8 @@ signals:
 
     void serialChanged();
 
+    void buttonsChanged();
+
 protected:
     int setImagePart(char key, char part);
 
@@ -76,7 +82,7 @@ private:
     //struct libevdev *dev;
     //struct libevdev_uinput *uidev;
     QSize m_imgsize;
-    int m_buttons=0;
+    uint m_buttons=0;
     void loop();
 };
 
