@@ -225,7 +225,7 @@ int CuteSdeck::resetDeck()
     return r;
 }
 
-int CuteSdeck::setBrightness(char percent)
+int CuteSdeck::setBrightness(uint8_t percent)
 {
     int r;
 
@@ -245,7 +245,7 @@ int CuteSdeck::setBrightness(char percent)
     return r;
 }
 
-bool CuteSdeck::setImageJPG(char key, const QString file)
+bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
 {
     QByteArray data;
     QFile f(file);
@@ -261,7 +261,7 @@ bool CuteSdeck::setImageJPG(char key, const QString file)
     return setImage(key, data.data(), data.size());
 }
 
-bool CuteSdeck::setImageText(char key, const QString txt)
+bool CuteSdeck::setImageText(uint8_t key, const QString txt)
 {
     QImage img=QImage(m_imgsize, QImage::Format_RGB32);
     img.fill(0);
@@ -279,7 +279,7 @@ bool CuteSdeck::setImageText(char key, const QString txt)
     return setImage(key, img);
 }
 
-bool CuteSdeck::setImage(char key, const QImage &img, bool scale)
+bool CuteSdeck::setImage(uint8_t key, const QImage &img, bool scale)
 {
     QByteArray tmp;
     QBuffer buf(&tmp);
@@ -306,13 +306,17 @@ bool CuteSdeck::setImage(char key, const QImage &img, bool scale)
     return false;
 }
 
-bool CuteSdeck::setImage(char key, const char *img, ssize_t imgsize)
+bool CuteSdeck::setImage(uint8_t key, const char *img, ssize_t imgsize)
 {
     int pn=0,len,sent,r=0;
     ssize_t remain;
 
     if (!handle)
         return -1;
+
+    if (key>m_buttons) {
+        return -1;
+    }
 
     QMutexLocker locker(&mutex);
 

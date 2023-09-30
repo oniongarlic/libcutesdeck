@@ -52,17 +52,17 @@ public slots:
 
     QString serialNumber();
 
-    int setBrightness(char percent);
+    int setBrightness(uint8_t percent);
     int resetDeck();
 
-    bool setImage(char key, const char *img, ssize_t imgsize);
-    bool setImage(char key, const QImage &img, bool scale=false);
+    bool setImage(uint8_t key, const char *img, ssize_t imgsize);
+    bool setImage(uint8_t key, const QImage &img, bool scale=false);
     int resetImages();
 
-    bool setImageText(char key, const QString txt);
-    bool setImageJPG(char key, const QString file);
+    bool setImageText(uint8_t key, const QString txt);
+    bool setImageJPG(uint8_t key, const QString file);
 signals:
-    void keyPressed(int key);
+    void keyPressed(uint8_t key);
     void isOpenChanged();
     void error();
 
@@ -82,7 +82,7 @@ private:
     //struct libevdev *dev;
     //struct libevdev_uinput *uidev;
     QSize m_imgsize;
-    uint m_buttons=0;
+    uint8_t m_buttons=0;
     void loop();
 };
 
