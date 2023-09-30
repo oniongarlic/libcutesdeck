@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QImage>
 #include <QFuture>
+#include <QQmlEngine>
 
 #include <hidapi.h>
 #include <linux/input.h>
@@ -14,7 +15,7 @@
 class CuteSdeck : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(Devices)
+    QML_ELEMENT
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY isOpenChanged FINAL)
     Q_PROPERTY(QString serial READ serial NOTIFY serialChanged FINAL)
 
@@ -31,6 +32,7 @@ public:
         DeckPedal=0x0086,
         DeckMiniMK2=0x0090
     };
+    Q_ENUM(Devices)
 
     ~CuteSdeck();
     bool isOpen();
