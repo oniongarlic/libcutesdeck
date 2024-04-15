@@ -71,7 +71,6 @@ protected:
 private slots:
     void readDeck();
 private:
-    bool m_running=false;    
     QString m_serial;    
     QSize m_imgsize;
     uint8_t m_buttons=0;

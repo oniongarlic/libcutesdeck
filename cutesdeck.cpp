@@ -149,7 +149,7 @@ bool CuteSdeck::openDeck(Devices id, QString serial)
 
     const char *tmp = foundDevices.first().toLocal8Bit().data();
 
-    hid_fd = open(tmp, O_RDWR); // |O_NONBLOCK);
+    hid_fd = open(tmp, O_RDWR | O_NONBLOCK);
 
     if (!hid_fd) {
         qWarning("Device not found");
@@ -208,11 +208,17 @@ bool CuteSdeck::openDeck(Devices id, QString serial)
 }
 
 bool CuteSdeck::closeDeck()
-{       
-    m_hid_notifier->disconnect();
+{
+    if (m_hid_notifier) {
+        m_hid_notifier->disconnect();
+        delete m_hid_notifier;
+        m_hid_notifier=nullptr;
+    }
 
-    if (hid_fd>0)
+    if (hid_fd>0) {
         close(hid_fd);
+        hid_fd=-1;
+    }
 
     emit isOpenChanged();
 
@@ -230,14 +236,16 @@ void CuteSdeck::readDeck()
     res=read(hid_fd, buf, 64);
 
     if (res==-1) {
-        qWarning("hidraw read error");
-        m_running = false;
+        qWarning("read -1");
+        closeDeck();
         emit error();
         return;
     }
 
-    if (res==0)
+    if (res==0) {
+        qWarning("read 0");
         return;
+    }
 
     for (int i=0;i<m_buttons;i++) {
         if (buf[KEY_OFFSET+i]==1) {
