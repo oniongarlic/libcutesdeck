@@ -20,5 +20,5 @@ See example usage in example.qml file.
 * Implement (and test) support for other Deck versions
 
 ## Requirements:
-* libusb
-* libhidapi
+* Qt 6
+* libudev
