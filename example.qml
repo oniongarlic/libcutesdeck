@@ -21,20 +21,15 @@ ApplicationWindow {
                 text: "Open"
                 enabled: !csd.isOpen
                 onClicked: {
-                    csd.open(CuteStreamDeck.DeckOriginalV2)
+                    csd.openDeck(CuteStreamDeck.DeckOriginalV2)
                 }
             }
             ToolButton {
                 text: "Close"
                 enabled: csd.isOpen
                 onClicked: {
-                    csd.close()
+                    csd.closeDeck()
                 }
-            }
-            ToolButton {
-                enabled: csd.isOpen
-                text: "Start listening"
-                onClicked: csd.start()
             }
             ToolButton {
                 enabled: csd.isOpen

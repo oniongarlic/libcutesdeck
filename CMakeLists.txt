@@ -11,8 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 NAMES Qt6 REQUIRED COMPONENTS Core Gui Concurrent Qml)
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules(LIBUSB1 libusb-1.0)
-pkg_check_modules(HIDAPI hidapi-libusb)
+pkg_check_modules(LIBUDEV libudev)
 
 qt6_policy(SET QTP0001 NEW)
 qt_standard_project_setup(REQUIRES 6.5)
@@ -27,8 +26,8 @@ set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 
 set_target_properties(cutesdeck PROPERTIES PUBLIC_HEADER cutesdeck.h)
 
-target_include_directories(cutesdeck SYSTEM PUBLIC ${LIBUSB1_INCLUDE_DIRS} ${HIDAPI_INCLUDE_DIRS})
-target_link_libraries(cutesdeck PRIVATE Qt6::Core Qt6::Gui Qt6::Concurrent Qt6::Qml ${LIBUSB1_LIBRARIES} ${HIDAPI_LIBRARIES})
+target_include_directories(cutesdeck SYSTEM PUBLIC ${LIBUDEV_INCLUDE_DIRS})
+target_link_libraries(cutesdeck PRIVATE Qt6::Core Qt6::Gui Qt6::Concurrent Qt6::Qml ${LIBUDEV_LIBRARIES})
 
 qt_add_qml_module(cutesdeck
     URI "CutesDeck"

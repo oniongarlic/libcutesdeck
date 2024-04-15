@@ -1,13 +1,13 @@
 #ifndef CUTESDECK_H
 #define CUTESDECK_H
 
+#include "qsocketnotifier.h"
 #include <QObject>
 #include <QImage>
 #include <QFuture>
 #include <QQmlEngine>
 
-#include <hidapi/hidapi.h>
-#include <linux/input.h>
+#include <libudev.h>
 
 class CuteSdeck : public QObject
 {
@@ -41,11 +41,9 @@ public:
     uint buttons() const;
 
 public slots:
-    bool open(Devices id);
-    bool open(Devices id, QString serial);
-    bool close();
-
-    void start();
+    bool openDeck(Devices id);
+    bool openDeck(Devices id, QString serial);
+    bool closeDeck();
 
     QString serialNumber();
 
@@ -59,7 +57,7 @@ public slots:
     bool setImageText(uint8_t key, const QString txt);
     bool setImageJPG(uint8_t key, const QString file);
 signals:
-    void keyPressed(uint8_t key);
+    void keyPressed(quint8 key);
     void isOpenChanged();
     void error();
 
@@ -70,17 +68,26 @@ signals:
 protected:
     int setImagePart(char key, char part);
 
+private slots:
+    void readDeck();
 private:
-    QFuture<void> m_future;
-    QMutex mutex;
-    bool m_running=false;
-    hid_device *handle=nullptr;
-    QString m_serial;
-    //struct libevdev *dev;
-    //struct libevdev_uinput *uidev;
+    bool m_running=false;    
+    QString m_serial;    
     QSize m_imgsize;
     uint8_t m_buttons=0;
+
+    bool have_udev;
+    struct udev *udev;
+    struct udev_monitor *mon;
+    struct libevdev *edev;
+    int udev_fd;
+    int hid_fd;
+    QSocketNotifier *m_hid_notifier;
+    QStringList foundDevices;
+
     void loop();
+    QStringList findInputDevices();
+    int hidraw_send_feature_report(const unsigned char *data, size_t length);
 };
 
 #endif // CUTESDECK_H
