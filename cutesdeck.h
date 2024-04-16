@@ -8,6 +8,7 @@
 #include <QQmlEngine>
 
 #include <libudev.h>
+#include <linux/hidraw.h>
 
 class CuteSdeck : public QObject
 {
@@ -91,6 +92,7 @@ private:
     int hidraw_send_feature_report(const unsigned char *data, size_t length);
     void enableUdevMonitoring();
     bool probeDevice(const char *devpath);
+    short getVendorProduct(int fd, hidraw_devinfo &info);
 };
 
 #endif // CUTESDECK_H

@@ -87,6 +87,15 @@ int CuteSdeck::findInputDevices()
     return m_devices.count();
 }
 
+short CuteSdeck::getVendorProduct(int fd, struct hidraw_devinfo &info)
+{
+    int res = ioctl(fd, HIDIOCGRAWINFO, &info);
+    if (res < 0)
+        return -1;
+
+    return info.product;
+}
+
 bool CuteSdeck::probeDevice(const char *devpath)
 {
     int fd;
@@ -101,9 +110,11 @@ bool CuteSdeck::probeDevice(const char *devpath)
         return false;
     }
 
-    int res = ioctl(fd, HIDIOCGRAWINFO, &info);
-    if (res < 0)
+    int product=getVendorProduct(fd, info);
+    if (product < 0) {
+        close(fd);
         return false;
+    }
 
     close(fd);
 
@@ -186,13 +197,17 @@ bool CuteSdeck::openDeck(Devices id, QString serial)
 
     hid_fd = open(tmp, O_RDWR | O_NONBLOCK);
 
+    struct hidraw_devinfo info;
+    int product=getVendorProduct(hid_fd, info);
+
     if (!hid_fd) {
         qWarning("Device not found");
         return false;
     }
 
-    switch (id) {
+    switch (product) {
     case DeckUnknown:
+        qWarning("Unknown?");
     case DeckOriginal:
         qWarning("Untested");
     case DeckOriginalV2:
