@@ -409,6 +409,9 @@ bool CuteSdeck::setImage(uint8_t key, const QImage &img, bool scale)
     if (img.isNull())
         return false;
 
+    if (m_imgsize.width()==0 || m_imgsize.height()==0)
+        return false;
+
     if (!scale && img.width()!=m_imgsize.width() && img.height()!=m_imgsize.height()) {
         qWarning() << "Button image must be " << m_imgsize;
         return false;
