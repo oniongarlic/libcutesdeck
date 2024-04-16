@@ -70,8 +70,9 @@ protected:
 
 private slots:
     void readDeck();
+    void readUdevMonitor();
 private:
-    QString m_serial;    
+    QString m_serial;
     QSize m_imgsize;
     uint8_t m_buttons=0;
 
@@ -82,11 +83,14 @@ private:
     int udev_fd;
     int hid_fd;
     QSocketNotifier *m_hid_notifier;
+    QSocketNotifier *m_udev_notifier;
     QStringList foundDevices;
 
     void loop();
     QStringList findInputDevices();
     int hidraw_send_feature_report(const unsigned char *data, size_t length);
+    void enableUdevMonitoring();
+    bool probeDevice(const char *devpath);
 };
 
 #endif // CUTESDECK_H
