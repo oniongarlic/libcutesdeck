@@ -83,11 +83,11 @@ private:
     int udev_fd;
     int hid_fd;
     QSocketNotifier *m_hid_notifier;
-    QSocketNotifier *m_udev_notifier;
-    QStringList foundDevices;
+    QSocketNotifier *m_udev_notifier;    
+    QMap<QString, QString> m_devices;
 
     void loop();
-    QStringList findInputDevices();
+    int findInputDevices();
     int hidraw_send_feature_report(const unsigned char *data, size_t length);
     void enableUdevMonitoring();
     bool probeDevice(const char *devpath);

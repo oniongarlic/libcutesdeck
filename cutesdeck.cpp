@@ -40,23 +40,11 @@ CuteSdeck::CuteSdeck(QObject *parent)
     enableUdevMonitoring();
 }
 
-static void printDevice(struct udev_device *dev)
-{
-    const char *action=udev_device_get_action(dev);
-    printf(" Action: %s\n", action);
-    printf(" Node: %s\n", udev_device_get_devnode(dev));
-    printf(" Subsystem: %s\n", udev_device_get_subsystem(dev));
-    printf(" Devtype: %s\n", udev_device_get_devtype(dev));
-    printf(" Sysname: %s\n", udev_device_get_sysname(dev));
-}
-
-QStringList CuteSdeck::findInputDevices()
+int CuteSdeck::findInputDevices()
 {
     struct udev_enumerate *enumerate;
     struct udev_list_entry *devices, *dev_list_entry;
     struct hidraw_devinfo info;
-
-    foundDevices.clear();
 
     enumerate = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerate, "hidraw");
@@ -73,16 +61,11 @@ QStringList CuteSdeck::findInputDevices()
         dev=udev_device_new_from_syspath(udev, path);
         devpath=udev_device_get_devnode(dev);
 
-        printDevice(dev);
-
         if (!devpath)
             continue;
 
-        if (probeDevice(devpath)) {
-            foundDevices << devpath;
-        } else {
+        if (!probeDevice(devpath))
             continue;
-        }
 
         // Get parent USB device
         pdev=udev_device_get_parent_with_subsystem_devtype(dev, "usb", "usb_device");
@@ -94,19 +77,14 @@ QStringList CuteSdeck::findInputDevices()
         serial=udev_device_get_property_value(pdev, "ID_SERIAL");
 
         m_serial=serial;
-
-        printf("Found: %s / %s: %s\n", manufacturer, product, devpath);
-        printf("---PARENT----------------\n");
-        printf("USB: %s / %s (%s)\n", vendor, model, serial);
-        printDevice(pdev);
-        printf("----------------PARENT---\n");
+        m_devices.insert(devpath, serial);
 
         udev_device_unref(dev);
     }
 
-    qDebug() << "Found devices: "  << foundDevices;
+    qDebug() << "Found devices: "  << m_devices;
 
-    return foundDevices;
+    return m_devices.count();
 }
 
 bool CuteSdeck::probeDevice(const char *devpath)
@@ -151,12 +129,23 @@ void CuteSdeck::readUdevMonitor()
 
     qDebug() << "uDev: " << action << devpath;
 
-    if (hid_fd<0 && strcmp(action, "add")==0 && devpath) {
+    if (strcmp(action, "add")==0 && devpath) {
         qDebug() << "New device, checking: " << devpath;
         if (probeDevice(devpath)) {
+            struct udev_device *pdev;
+            const char *serial;
 
+            pdev=udev_device_get_parent_with_subsystem_devtype(dev, "usb", "usb_device");
+            serial=udev_device_get_property_value(pdev, "ID_SERIAL");
+
+            m_devices.insert(devpath, serial);
         }
+    } else if (strcmp(action, "remove")==0 && devpath) {
+        int r=m_devices.remove(devpath);
     }
+
+    qDebug() << "Found devices: "  << m_devices;
+
     udev_device_unref(dev);
 }
 
@@ -188,7 +177,12 @@ bool CuteSdeck::openDeck(Devices id, QString serial)
         return false;
     }
 
-    const char *tmp = foundDevices.first().toLocal8Bit().data();
+    if (m_devices.empty()) {
+        qWarning("No devices");
+        return false;
+    }
+
+    const char *tmp = m_devices.firstKey().toLocal8Bit().data();
 
     hid_fd = open(tmp, O_RDWR | O_NONBLOCK);
 
