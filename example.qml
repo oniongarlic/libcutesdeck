@@ -93,10 +93,24 @@ ApplicationWindow {
 
     CuteStreamDeck {
         id: csd
+        autoOpen: true
 
         onIsOpenChanged: {
-            if (isOpen)
+            console.debug("onIsOpenChanged", isOpen);
+            if (isOpen) {
                 console.debug(serialNumber())
+                csd.resetDeck();
+                csd.setImageText(0, "Hello");
+                csd.setImageText(1, "World");
+            }
+        }
+
+        onButtonsChanged: {
+            console.debug("Buttons count", buttons)
+        }
+
+        onSerialChanged: {
+            console.debug("New serial", serial)
         }
 
         onKeyPressed: (key) => {

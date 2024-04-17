@@ -33,11 +33,23 @@ static uint8_t img_data[65535];
 
 CuteSdeck::CuteSdeck(QObject *parent)
     : QObject{parent},
-    m_imgsize(72,72)
-{
-    hid_fd=-1;
+    m_imgsize(72,72),
+    m_autoOpen(true)
+{    
     findInputDevices();
     enableUdevMonitoring();
+}
+
+void CuteSdeck::classBegin()
+{
+
+}
+
+void CuteSdeck::componentComplete()
+{
+    if (m_devices.count()>0 && m_autoOpen) {
+        openDeck(0);
+    }
 }
 
 int CuteSdeck::findInputDevices()
@@ -174,14 +186,7 @@ CuteSdeck::~CuteSdeck()
     closeDeck();
 }
 
-bool CuteSdeck::openDeck(Devices id)
-{
-    QString dummy;
-
-    return openDeck(id, dummy);
-}
-
-bool CuteSdeck::openDeck(Devices id, QString serial)
+bool CuteSdeck::openDeck(int id)
 {
     if (hid_fd>0) {
         qWarning("Device already open");
@@ -250,6 +255,8 @@ bool CuteSdeck::openDeck(Devices id, QString serial)
     qDebug() << "Buttons " << m_buttons;
 
     emit buttonsChanged();
+
+    getBrightness();
 
     m_hid_notifier = new QSocketNotifier(hid_fd, QSocketNotifier::Read, this);
     connect(m_hid_notifier, SIGNAL(activated(int)), this, SLOT(readDeck()));
@@ -362,6 +369,12 @@ int CuteSdeck::setBrightness(uint8_t percent)
         qWarning("setBrightness failed");
     return r;
 }
+
+int CuteSdeck::getBrightness()
+{
+    return -1;
+}
+
 
 bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
 {
@@ -502,4 +515,25 @@ int CuteSdeck::hidraw_send_feature_report(const unsigned char *data, size_t leng
         return -1;
 
     return ioctl(hid_fd, HIDIOCSFEATURE(length), data);
+}
+
+int CuteSdeck::hidraw_get_feature_report(const unsigned char *data, size_t length)
+{
+    if (hid_fd<0)
+        return -1;
+
+    return ioctl(hid_fd, HIDIOCGFEATURE(length), data);
+}
+
+bool CuteSdeck::autoOpen() const
+{
+    return m_autoOpen;
+}
+
+void CuteSdeck::setAutoOpen(bool newAutoOpen)
+{
+    if (m_autoOpen == newAutoOpen)
+        return;
+    m_autoOpen = newAutoOpen;
+    emit autoOpenChanged();
 }
