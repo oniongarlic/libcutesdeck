@@ -96,6 +96,8 @@ int CuteSdeck::findInputDevices()
 
     qDebug() << "Found devices: "  << m_devices;
 
+    emit devicesChanged();
+
     return m_devices.count();
 }
 
@@ -167,9 +169,11 @@ void CuteSdeck::readUdevMonitor()
         int r=m_devices.remove(devpath);
     }
 
-    qDebug() << "Found devices: "  << m_devices;
+    qDebug() << "Found devices: "  << m_devices;    
 
     udev_device_unref(dev);
+
+    emit devicesChanged();
 }
 
 void CuteSdeck::enableUdevMonitoring() {
@@ -536,4 +540,9 @@ void CuteSdeck::setAutoOpen(bool newAutoOpen)
         return;
     m_autoOpen = newAutoOpen;
     emit autoOpenChanged();
+}
+
+uint CuteSdeck::devices() const
+{
+    return m_devices.count();
 }

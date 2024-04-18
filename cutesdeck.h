@@ -19,7 +19,7 @@ class CuteSdeck : public QObject, public QQmlParserStatus
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY isOpenChanged FINAL)
     Q_PROPERTY(bool autoOpen READ autoOpen WRITE setAutoOpen NOTIFY autoOpenChanged FINAL)
     Q_PROPERTY(QString serial READ serial NOTIFY serialChanged FINAL)
-
+    Q_PROPERTY(uint devices READ devices NOTIFY devicesChanged FINAL)
     Q_PROPERTY(uint buttons READ buttons NOTIFY buttonsChanged FINAL)
 
 public:
@@ -52,6 +52,8 @@ public:
     void setAutoOpen(bool newAutoOpen);
 
     int getBrightness();
+    uint devices() const;
+
 public slots:
     bool openDeck(int id);
     bool closeDeck();
@@ -69,14 +71,13 @@ public slots:
     bool setImageJPG(uint8_t key, const QString file);
 signals:
     void keyPressed(quint8 key);
-    void isOpenChanged();
     void error();
 
+    void isOpenChanged();
     void serialChanged();
-
     void buttonsChanged();
-
     void autoOpenChanged();
+    void devicesChanged();
 
 protected:
     int setImagePart(char key, char part);
