@@ -21,6 +21,8 @@ add_library(cutesdeck SHARED
   cutesdeck.h  
 )
 
+ADD_CUSTOM_TARGET(examples SOURCES example.qml)
+
 set(CMAKE_INSTALL_PREFIX ${CMAKE_PREFIX_PATH})
 set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 
