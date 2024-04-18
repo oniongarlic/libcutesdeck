@@ -34,7 +34,9 @@ static uint8_t img_data[65535];
 CuteSdeck::CuteSdeck(QObject *parent)
     : QObject{parent},
     m_imgsize(72,72),
-    m_autoOpen(true)
+    m_autoOpen(true),
+    m_background(Qt::black),
+    m_foreground(Qt::yellow)
 {    
     findInputDevices();
     enableUdevMonitoring();
@@ -399,12 +401,12 @@ bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
 bool CuteSdeck::setImageText(uint8_t key, const QString txt)
 {
     QImage img=QImage(m_imgsize, QImage::Format_RGB32);
-    img.fill(0);
+    img.fill(m_background);
 
     QPainter p;
     if (!p.begin(&img)) return false;
 
-    p.setPen(QPen(Qt::yellow));
+    p.setPen(QPen(m_foreground));
     p.setFont(QFont("Times", 12, QFont::Bold));
     p.drawText(img.rect(), Qt::AlignCenter, txt);
     p.end();

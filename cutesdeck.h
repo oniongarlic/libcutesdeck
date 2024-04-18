@@ -102,6 +102,9 @@ private:
     QSocketNotifier *m_udev_notifier;    
     QMap<QString, QString> m_devices;
 
+    QColor m_background;
+    QColor m_foreground;
+
     int findInputDevices();
     int hidraw_send_feature_report(const unsigned char *data, size_t length);
     int hidraw_get_feature_report(const unsigned char *data, size_t length);
