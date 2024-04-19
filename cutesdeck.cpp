@@ -167,6 +167,10 @@ void CuteSdeck::readUdevMonitor()
             serial=udev_device_get_property_value(pdev, "ID_SERIAL");
 
             m_devices.insert(devpath, serial);
+
+            if (hid_fd<0 && m_autoOpen) {
+                openDeck(0);
+            }
         }
     } else if (strcmp(action, "remove")==0 && devpath) {
         int r=m_devices.remove(devpath);
