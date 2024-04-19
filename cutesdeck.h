@@ -114,8 +114,8 @@ private:
     int udev_fd=-1;
     int hid_fd=-1;
 
-    QSocketNotifier *m_hid_notifier;
-    QSocketNotifier *m_udev_notifier;    
+    QSocketNotifier *m_hid_notifier=nullptr;
+    QSocketNotifier *m_udev_notifier=nullptr;
     QMap<QString, QString> m_devices;
 
     QColor m_background;
