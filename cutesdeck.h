@@ -80,6 +80,7 @@ public slots:
     bool setImageJPG(uint8_t key, const QString file);
 signals:
     void keyPressed(quint8 key);
+    void keyReleased(quint8 key);
     void error();
 
     void isOpenChanged();
@@ -99,6 +100,8 @@ private slots:
     void readDeck();
     void readUdevMonitor();
 private:
+    unsigned char btnbuf[255];
+
     QString m_serial;
     QSize m_imgsize;
     uint8_t m_buttons=0;

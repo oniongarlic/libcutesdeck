@@ -229,6 +229,9 @@ ApplicationWindow {
                               break;
                           }
                       }
+        onKeyReleased: {
+            buttonPressed=-1;
+        }
     }
 
 }

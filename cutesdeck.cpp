@@ -37,7 +37,8 @@ CuteSdeck::CuteSdeck(QObject *parent)
     m_autoOpen(true),
     m_background(Qt::black),
     m_foreground(Qt::yellow)
-{    
+{
+    memset(btnbuf, 0, 255);
     findInputDevices();
     enableUdevMonitoring();
 }
@@ -313,7 +314,10 @@ void CuteSdeck::readDeck()
     for (int i=0;i<m_buttons;i++) {
         if (buf[KEY_OFFSET+i]==1) {
             emit keyPressed(i);
+        } else if (buf[KEY_OFFSET+i]!=btnbuf[i]) {
+            emit keyReleased(i);
         }
+        btnbuf[i]=buf[KEY_OFFSET+i];
     }
 }
 
