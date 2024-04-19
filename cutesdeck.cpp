@@ -388,6 +388,7 @@ int CuteSdeck::getBrightness()
 
 bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
 {
+#if 1
     QByteArray data;
     QFile f(file);
 
@@ -399,7 +400,20 @@ bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
     data=f.readAll();
     f.close();
 
+    qDebug() << "setImage: readAll" << data.size();
+
     return setImage(key, data.data(), data.size());
+#else
+    QImage img(file);
+
+    if (img.isNull()) {
+        qWarning() << "Failed to load image " << file;
+        return false;
+    }
+    qDebug() << img.size();
+
+    return setImage(key, img);
+#endif
 }
 
 bool CuteSdeck::setImageText(uint8_t key, const QString txt)
@@ -426,14 +440,20 @@ bool CuteSdeck::setImage(uint8_t key, const QImage &img, bool scale)
     QBuffer buf(&tmp);
     QImage imgc=img;
 
-    if (hid_fd<0)
+    if (hid_fd<0) {
+        qWarning() << "setImage: not connected";
         return false;
+    }
 
-    if (img.isNull())
+    if (img.isNull()) {
+        qWarning() << "setImage: invalid image";
         return false;
+    }
 
-    if (m_imgsize.width()==0 || m_imgsize.height()==0)
+    if (m_imgsize.width()==0 || m_imgsize.height()==0) {
+        qWarning() << "setImage: invalid image size";
         return false;
+    }
 
     if (!scale && img.width()!=m_imgsize.width() && img.height()!=m_imgsize.height()) {
         qWarning() << "Button image must be " << m_imgsize;
@@ -444,9 +464,12 @@ bool CuteSdeck::setImage(uint8_t key, const QImage &img, bool scale)
 
     buf.open(QIODevice::WriteOnly);
     if (imgc.save(&buf, "jpg", 100)) {
+        buf.close();
         setImage(key, tmp.data(), (ssize_t)tmp.size());
         return true;
     }
+    buf.close();
+    qWarning() << "setImage: image save failure";
     return false;
 }
 
@@ -455,10 +478,13 @@ bool CuteSdeck::setImage(uint8_t key, const char *img, ssize_t imgsize)
     int pn=0,len,sent,r=0;
     ssize_t remain;
 
-    if (hid_fd<0)
+    if (hid_fd<0) {
+        qWarning() << "setImage: not connected";
         return -1;
+    }
 
     if (key>m_buttons) {
+        qWarning() << "setImage: invalid key";
         return -1;
     }
 

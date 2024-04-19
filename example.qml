@@ -108,24 +108,26 @@ ApplicationWindow {
                 enabled: csd.isOpen
                 text: "Set text"
                 onClicked: {
-                    csd.setImageText(0, "Record");
-                    csd.setImageText(1, "Play");
-                    csd.setImageText(2, "Stop");
-                    csd.setImageText(3, "Cut");
-                    csd.setImageText(4, "Auto");
+                    csd.setImageText(0, "CAM\n1");
+                    csd.setImageText(1, "CAM\n2");
+                    csd.setImageText(2, "CAM\n3");
+                    csd.setImageText(3, "CAM\n4");
+                    csd.setImageText(4, "Super\nSource");
 
-                    csd.setImageText(5, "CAM\n1");
-                    csd.setImageText(6, "CAM\n2");
-                    csd.setImageText(7, "CAM\n3");
-                    csd.setImageText(8, "CAM\n4");
-                    csd.setImageText(9, "Super\nSource");
-
-                    csd.setImageText(10, "CAM\n5");
-                    csd.setImageText(11, "CAM\n6");
-                    csd.setImageText(12, "CAM\n7");
-                    csd.setImageText(13, "CAM\n8");
-
-                    //csd.setImageJPG(14, ":/button-0.jpg")
+                    csd.setImageText(5, "CAM\n5");
+                    csd.setImageText(6, "CAM\n6");
+                    csd.setImageText(7, "CAM\n7");
+                    csd.setImageText(8, "CAM\n8");
+                    csd.setImageText(9, "M/E\n2");
+                }
+            }
+            ToolButton {
+                enabled: csd.isOpen
+                text: "Set images"
+                onClicked: {
+                    csd.setImageJPG(0, "icons/play.jpg")
+                    csd.setImageJPG(1, "icons/play.jpg")
+                    csd.setImageJPG(2, "icons/play.jpg")
                 }
             }
             Slider {
@@ -187,7 +189,7 @@ ApplicationWindow {
     CuteStreamDeck {
         id: csd
         autoOpen: true
-        background: "grey"
+        background: "black"
         foreground: "green"
 
         property int buttonPressed: -1
