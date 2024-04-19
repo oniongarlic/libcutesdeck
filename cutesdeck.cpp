@@ -548,3 +548,29 @@ uint CuteSdeck::devices() const
 {
     return m_devices.count();
 }
+
+QColor CuteSdeck::background() const
+{
+    return m_background;
+}
+
+void CuteSdeck::setBackground(const QColor &newBackground)
+{
+    if (m_background == newBackground)
+        return;
+    m_background = newBackground;
+    emit backgroundChanged();
+}
+
+QColor CuteSdeck::foreground() const
+{
+    return m_foreground;
+}
+
+void CuteSdeck::setForeground(const QColor &newForeground)
+{
+    if (m_foreground == newForeground)
+        return;
+    m_foreground = newForeground;
+    emit foregroundChanged();
+}

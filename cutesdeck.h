@@ -22,6 +22,9 @@ class CuteSdeck : public QObject, public QQmlParserStatus
     Q_PROPERTY(uint devices READ devices NOTIFY devicesChanged FINAL)
     Q_PROPERTY(uint buttons READ buttons NOTIFY buttonsChanged FINAL)
 
+    Q_PROPERTY(QColor background READ background WRITE setBackground NOTIFY backgroundChanged FINAL)
+    Q_PROPERTY(QColor foreground READ foreground WRITE setForeground NOTIFY foregroundChanged FINAL)
+
 public:
     explicit CuteSdeck(QObject *parent = nullptr);
 
@@ -54,6 +57,12 @@ public:
     int getBrightness();
     uint devices() const;
 
+    QColor background() const;
+    void setBackground(const QColor &newBackground);
+
+    QColor foreground() const;
+    void setForeground(const QColor &newForeground);
+
 public slots:
     bool openDeck(int id);
     bool closeDeck();
@@ -78,6 +87,10 @@ signals:
     void buttonsChanged();
     void autoOpenChanged();
     void devicesChanged();
+
+    void backgroundChanged();
+
+    void foregroundChanged();
 
 protected:
     int setImagePart(char key, char part);
