@@ -142,22 +142,55 @@ ApplicationWindow {
                 id: serialText
                 text: csd.serial
             }
+            Label {
+                id: btnText
+            }
+        }
+    }
+
+    Component {
+        id: deckButton
+        Rectangle {
+            id: dbc
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            border.width: 2
+            color: csd.buttonPressed==index ? "yellow" : "black"
+            required property int index
+            Text {
+                id: btn
+                color: "#14e83b"
+                anchors.centerIn: parent
+                font.pixelSize: 64
+                text: dbc.index
+            }
         }
     }
 
     Rectangle {
         anchors.fill: parent
-        color: "red"
-        Text {
-            id: btnText
-            anchors.centerIn: parent
-            font.pixelSize: 64
+        anchors.margins: 16
+        color: "grey"
+        GridLayout {
+            anchors.fill: parent
+            rows: 3
+            columns: 5
+            rowSpacing: 4
+            columnSpacing: 4
+            Repeater {
+                model: 15//csd.buttons
+                delegate: deckButton
+            }
         }
     }
 
     CuteStreamDeck {
         id: csd
         autoOpen: true
+        background: "grey"
+        foreground: "green"
+
+        property int buttonPressed: -1
 
         onIsOpenChanged: {
             console.debug("onIsOpenChanged", isOpen);
@@ -181,6 +214,7 @@ ApplicationWindow {
         }
 
         onKeyPressed: (key) => {
+                          buttonPressed=key;
                           console.debug(key)
                           btnText.text=key
                           switch (key) {
