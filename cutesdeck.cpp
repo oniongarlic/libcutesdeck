@@ -233,7 +233,6 @@ bool CuteSdeck::openDeck(int id)
         break;
     case DeckXL:
     case DeckXLV2:
-        qWarning("Untested");
         m_imgsize.setHeight(96);
         m_imgsize.setWidth(96);
         m_buttons=32;
