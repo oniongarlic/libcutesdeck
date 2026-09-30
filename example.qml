@@ -125,9 +125,7 @@ ApplicationWindow {
                 enabled: csd.isOpen
                 text: "Set images"
                 onClicked: {
-                    csd.setImageJPG(0, "icons/play.jpg")
-                    csd.setImageJPG(1, "icons/play.jpg")
-                    csd.setImageJPG(2, "icons/play.jpg")
+                    setImages();
                 }
             }
             Slider {
@@ -148,6 +146,12 @@ ApplicationWindow {
                 id: btnText
             }
         }
+    }
+
+    function setImages() {
+        csd.setImageJPG(0, "icons/play.jpg")
+        csd.setImageJPG(1, "icons/play.jpg")
+        csd.setImageJPG(2, "icons/play.jpg")
     }
 
     Component {
@@ -175,12 +179,12 @@ ApplicationWindow {
         color: "grey"
         GridLayout {
             anchors.fill: parent
-            rows: 3
-            columns: 5
+            rows: csd.rows
+            columns: csd.columns
             rowSpacing: 4
             columnSpacing: 4
             Repeater {
-                model: 15//csd.buttons
+                model: csd.buttons
                 delegate: deckButton
             }
         }
@@ -228,6 +232,9 @@ ApplicationWindow {
                               break;
                               case 1:
                               page=0;
+                              break;
+                              case 2:
+                              setImages()
                               break;
                           }
                       }
