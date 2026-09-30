@@ -230,29 +230,39 @@ bool CuteSdeck::openDeck(int id)
         m_imgsize.setHeight(72);
         m_imgsize.setWidth(72);
         m_buttons=15;
+        m_rows=4;
+        m_columns=6;
         break;
     case DeckXL:
     case DeckXLV2:
         m_imgsize.setHeight(96);
         m_imgsize.setWidth(96);
         m_buttons=32;
+        m_rows=4;
+        m_columns=8;
         break;
     case DeckMK2:
         qWarning("Untested");
         m_imgsize.setHeight(72);
         m_imgsize.setWidth(72);
         m_buttons=15;
+        m_rows=4;
+        m_columns=6;
     case DeckMiniMK2:
         qWarning("Untested");
         m_imgsize.setHeight(72);
         m_imgsize.setWidth(72);
         m_buttons=6;
+        m_rows=2;
+        m_columns=3;
         break;
     case DeckPedal:
         qWarning("Untested");
         m_imgsize.setHeight(0);
         m_imgsize.setWidth(0);
         m_buttons=3;
+        m_rows=1;
+        m_columns=3;
         break;
     }
 
@@ -265,6 +275,8 @@ bool CuteSdeck::openDeck(int id)
     qDebug() << "Buttons " << m_buttons;
 
     emit buttonsChanged();
+    emit rowsChanged();
+    emit columnsChanged();
 
     getBrightness();
 
@@ -395,9 +407,20 @@ int CuteSdeck::getBrightness()
 }
 
 
-bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
+bool CuteSdeck::setImageJPG(uint8_t key, const QString file, bool autosize)
 {
-#if 1
+    QImage img(file);
+
+    if (img.isNull()) {
+        qWarning() << "Failed to load image " << file;
+        return false;
+    }
+
+    return setImage(key, img, autosize);
+}
+
+bool CuteSdeck::setImageJPGRaw(uint8_t key, const QString file)
+{
     QByteArray data;
     QFile f(file);
 
@@ -412,17 +435,6 @@ bool CuteSdeck::setImageJPG(uint8_t key, const QString file)
     qDebug() << "setImage: readAll" << data.size();
 
     return setImage(key, data.data(), data.size());
-#else
-    QImage img(file);
-
-    if (img.isNull()) {
-        qWarning() << "Failed to load image " << file;
-        return false;
-    }
-    qDebug() << img.size();
-
-    return setImage(key, img);
-#endif
 }
 
 bool CuteSdeck::setImageText(uint8_t key, const QString txt)
@@ -549,10 +561,7 @@ QString CuteSdeck::serial() const
     return m_serial;
 }
 
-uint CuteSdeck::buttons() const
-{
-    return m_buttons;
-}
+
 
 int CuteSdeck::hidraw_send_feature_report(const unsigned char *data, size_t length)
 {

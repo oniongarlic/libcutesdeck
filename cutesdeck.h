@@ -20,7 +20,10 @@ class CuteSdeck : public QObject, public QQmlParserStatus
     Q_PROPERTY(bool autoOpen READ autoOpen WRITE setAutoOpen NOTIFY autoOpenChanged FINAL)
     Q_PROPERTY(QString serial READ serial NOTIFY serialChanged FINAL)
     Q_PROPERTY(uint devices READ devices NOTIFY devicesChanged FINAL)
+
     Q_PROPERTY(uint buttons READ buttons NOTIFY buttonsChanged FINAL)
+    Q_PROPERTY(uint rows READ rows NOTIFY rowsChanged FINAL)
+    Q_PROPERTY(uint columns READ columns NOTIFY columnsChanged FINAL)
 
     Q_PROPERTY(QColor background READ background WRITE setBackground NOTIFY backgroundChanged FINAL)
     Q_PROPERTY(QColor foreground READ foreground WRITE setForeground NOTIFY foregroundChanged FINAL)
@@ -48,7 +51,18 @@ public:
 
     QString serial() const;
 
-    uint buttons() const;
+    uint buttons() const
+    {
+        return m_buttons;
+    }
+    uint rows() const
+    {
+        return m_rows;
+    }
+    uint columns() const
+    {
+        return m_columns;
+    }
 
     bool autoOpen() const;
 
@@ -77,7 +91,9 @@ public slots:
     int resetImages();
 
     bool setImageText(uint8_t key, const QString txt);
-    bool setImageJPG(uint8_t key, const QString file);
+    bool setImageJPG(uint8_t key, const QString file, bool autosize=true);
+    bool setImageJPGRaw(uint8_t key, const QString file);
+
 signals:
     void keyPressed(quint8 key);
     void keyReleased(quint8 key);
@@ -86,6 +102,8 @@ signals:
     void isOpenChanged();
     void serialChanged();
     void buttonsChanged();
+    void rowsChanged();
+    void columnsChanged();
     void autoOpenChanged();
     void devicesChanged();
 
@@ -105,6 +123,8 @@ private:
     QString m_serial;
     QSize m_imgsize;
     uint8_t m_buttons=0;
+    uint8_t m_rows=0;
+    uint8_t m_columns=0;
     bool m_autoOpen;
 
     bool have_udev;
