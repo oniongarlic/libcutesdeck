@@ -359,6 +359,9 @@ int CuteSdeck::resetDeck()
 {
     int r;
 
+    if (hid_fd<0)
+        return -1;
+
     memset(img_buffer, 0, 32);
     img_buffer[0]=0x03;
     img_buffer[1]=0x02;
@@ -371,7 +374,10 @@ int CuteSdeck::resetDeck()
 
 int CuteSdeck::setBrightness(uint8_t percent)
 {
-    int r;    
+    int r;
+
+    if (hid_fd<0)
+        return -1;
 
     memset(img_buffer, 0, 32);
     img_buffer[0]=0x03;
