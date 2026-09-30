@@ -12,6 +12,7 @@ See example usage in example.qml file.
 
 ## Tested Stream Decks:
 * Stream Deck Version 2
+* Stream Deck XL
 
 ## Untested
 * All other
